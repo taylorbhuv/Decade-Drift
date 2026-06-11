@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DecadeDrift — Navigating Market Evolution</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0a0d12;
+  --bg2: #0e1219;
+  --bg3: #141820;
+  --border: rgba(255,255,255,0.07);
+  --orange: #f5820a;
+  --orange-dim: rgba(245,130,10,0.15);
+  --orange-glow: rgba(245,130,10,0.06);
+  --blue: #4ab3f4;
+  --green: #3dd68c;
+  --red: #f45c5c;
+  --text: #e8edf5;
+  --muted: #6b7a8d;
+  --mono: 'Share Tech Mono', monospace;
+  --head: 'Rajdhani', sans-serif;
+  --body: 'Inter', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--body);overflow-x:hidden;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--orange);border-radius:2px;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:56px;background:rgba(10,13,18,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;color:var(--text);text-decoration:none;}
+.nav-logo svg{width:22px;height:22px;}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:1px;transition:color .2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.nav-links a.active{text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--orange);}
+.nav-cta{font-family:var(--mono);font-size:12px;background:transparent;border:1px solid var(--orange);color:var(--orange);padding:7px 20px;letter-spacing:2px;cursor:pointer;transition:all .2s;}
+.nav-cta:hover{background:var(--orange);color:#000;}
+
+/* ── PAGES ── */
+.page{display:none;padding-top:56px;}
+.page.active{display:block;}
+
+/* ── HERO ── */
+#hero-section{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 40px 60px;position:relative;overflow:hidden;}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(245,130,10,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(245,130,10,0.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;}
+.hero-status{font-family:var(--mono);font-size:11px;color:var(--orange);letter-spacing:3px;margin-bottom:28px;display:flex;align-items:center;gap:8px;}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.hero-title{font-family:var(--head);font-size:clamp(48px,8vw,96px);font-weight:700;line-height:.9;letter-spacing:2px;margin-bottom:24px;}
+.hero-title .highlight{color:var(--orange);}
+.hero-sub{font-family:var(--mono);font-size:13px;color:var(--muted);letter-spacing:2px;margin-bottom:48px;max-width:500px;}
+.hero-btn{font-family:var(--mono);font-size:12px;background:var(--orange);color:#000;border:none;padding:14px 36px;letter-spacing:3px;cursor:pointer;font-weight:700;transition:all .2s;position:relative;overflow:hidden;}
+.hero-btn:hover{background:#fff;color:#000;}
+.hero-coords{display:flex;justify-content:space-between;width:100%;max-width:800px;margin-top:60px;font-family:var(--mono);font-size:11px;color:var(--muted);}
+.hero-coords span{display:flex;align-items:center;gap:8px;}
+.hero-coords span::before{content:'';display:block;width:40px;height:1px;background:var(--border);}
+
+/* ── SECTION COMMON ── */
+.section{padding:80px 40px;max-width:1100px;margin:0 auto;}
+.section-eyebrow{font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:4px;text-transform:uppercase;margin-bottom:12px;}
+.section-title{font-family:var(--head);font-size:clamp(32px,4vw,52px);font-weight:700;margin-bottom:32px;line-height:1.0;}
+.divider{border:none;border-top:1px solid var(--border);margin:0 0 48px;}
+
+/* ── STOCKS TABLE ── */
+.year-block{margin-bottom:60px;}
+.year-label{font-family:var(--head);font-size:28px;font-weight:700;color:var(--orange);margin-bottom:6px;}
+.year-meta{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:20px;display:flex;gap:20px;flex-wrap:wrap;}
+.stocks-table{width:100%;border-collapse:collapse;}
+.stocks-table th{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;text-align:left;padding:8px 14px;border-bottom:1px solid var(--border);}
+.stocks-table td{font-family:var(--mono);font-size:13px;padding:14px;border-bottom:1px solid var(--border);transition:background .15s;}
+.stocks-table tr:hover td{background:var(--orange-glow);}
+.stocks-table .ticker{color:var(--orange);font-weight:700;}
+.stocks-table .gain{color:var(--green);}
+.stocks-table .loss{color:var(--red);}
+.stock-arrow{cursor:pointer;color:var(--orange);font-size:16px;transition:transform .2s;}
+.stock-arrow:hover{transform:translateX(4px);}
+.ticker-tape{background:var(--bg3);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:10px 0;overflow:hidden;white-space:nowrap;margin-bottom:0;}
+.ticker-inner{display:inline-flex;gap:32px;animation:ticker 30s linear infinite;}
+@keyframes ticker{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.ticker-item{font-family:var(--mono);font-size:11px;color:var(--muted);}
+.ticker-item .t{color:var(--text);font-weight:700;}
+.ticker-item .up{color:var(--green);}
+.ticker-item .dn{color:var(--red);}
+
+/* ── ANALYSIS CARDS ── */
+.analysis-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-top:32px;}
+.analysis-card{background:var(--bg3);border:1px solid var(--border);padding:24px;transition:border-color .2s,transform .2s;}
+.analysis-card:hover{border-color:var(--orange);transform:translateY(-2px);}
+.card-ticker{font-family:var(--head);font-size:22px;font-weight:700;color:var(--orange);margin-bottom:4px;}
+.card-name{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:14px;}
+.card-body{font-size:13px;color:#b0bcc9;line-height:1.7;}
+.card-gain{display:inline-block;font-family:var(--mono);font-size:12px;background:rgba(61,214,140,0.12);color:var(--green);padding:4px 10px;border-radius:2px;margin-bottom:14px;}
+.card-tag{display:inline-block;font-family:var(--mono);font-size:10px;background:var(--orange-dim);color:var(--orange);padding:3px 8px;letter-spacing:1px;margin-right:6px;margin-top:10px;}
+
+/* ── COMPARE PAGE ── */
+#compare-page{min-height:100vh;}
+.compare-hero{padding:60px 40px 40px;max-width:900px;margin:0 auto;text-align:center;}
+.compare-hero h1{font-family:var(--head);font-size:clamp(28px,5vw,56px);font-weight:700;margin-bottom:16px;}
+.compare-hero p{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:1px;}
+.stock-picker{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:32px auto;max-width:700px;}
+.pick-btn{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:10px 20px;cursor:pointer;letter-spacing:1px;transition:all .2s;}
+.pick-btn:hover,.pick-btn.selected{background:var(--orange-dim);border-color:var(--orange);color:var(--orange);}
+.compare-btn{font-family:var(--mono);font-size:12px;background:var(--orange);color:#000;border:none;padding:12px 36px;letter-spacing:2px;cursor:pointer;font-weight:700;margin:0 auto;display:block;transition:all .2s;}
+.compare-btn:hover{background:#fff;}
+.compare-results{max-width:900px;margin:40px auto;padding:0 40px 80px;}
+.compare-card{background:var(--bg3);border:1px solid var(--border);margin-bottom:24px;overflow:hidden;}
+.compare-header{display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--bg2);padding:18px 24px;border-bottom:1px solid var(--border);}
+.compare-header .col-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:6px;}
+.compare-header .col-value{font-family:var(--head);font-size:26px;font-weight:700;}
+.compare-header .col-value.green{color:var(--green);}
+.compare-header .col-value.red{color:var(--red);}
+.compare-bar-wrap{padding:20px 24px;}
+.compare-bar-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:10px;}
+.dual-bar{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.bar-side .year-tag{font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:6px;}
+.bar-track{background:rgba(255,255,255,0.05);height:28px;border-radius:2px;overflow:hidden;position:relative;}
+.bar-fill-2016{height:100%;background:linear-gradient(90deg,#4ab3f4,#4ab3f488);display:flex;align-items:center;padding-left:10px;}
+.bar-fill-2026{height:100%;background:linear-gradient(90deg,var(--orange),var(--orange-dim));display:flex;align-items:center;padding-left:10px;}
+.bar-pct{font-family:var(--mono);font-size:11px;font-weight:700;color:#000;}
+.compare-insight{padding:16px 24px;border-top:1px solid var(--border);font-size:13px;color:#9aafbf;line-height:1.65;}
+.compare-insight strong{color:var(--text);}
+.no-selection{text-align:center;font-family:var(--mono);font-size:13px;color:var(--muted);padding:60px 40px;}
+
+/* ── BLOG PAGE ── */
+#blog-page{min-height:100vh;}
+.blog-hero{padding:60px 40px 0;max-width:900px;margin:0 auto;}
+.blog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;max-width:1100px;margin:40px auto;padding:0 40px 80px;}
+.blog-card{background:var(--bg3);border:1px solid var(--border);padding:24px;cursor:pointer;transition:all .2s;}
+.blog-card:hover{border-color:var(--orange);transform:translateY(-2px);}
+.blog-tag{font-family:var(--mono);font-size:10px;color:var(--orange);letter-spacing:2px;margin-bottom:10px;}
+.blog-title{font-family:var(--head);font-size:20px;font-weight:700;margin-bottom:10px;line-height:1.2;}
+.blog-excerpt{font-size:13px;color:var(--muted);line-height:1.65;}
+.blog-date{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:14px;letter-spacing:1px;}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#" onclick="showPage('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+    DecadeDrift
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" id="nav-home" class="active" onclick="showPage('home')">Home</a></li>
+    <li><a href="#" id="nav-blog" onclick="showPage('blog')">Blog</a></li>
+  </ul>
+  <button class="nav-cta" onclick="showPage('compare')">ANALYZE</button>
+</nav>
+
+<!-- ═══════════ HOME PAGE ═══════════ -->
+<div id="home-page" class="page active">
+
+  <!-- HERO -->
+  <section id="hero-section">
+    <div class="hero-grid"></div>
+    <div class="hero-status"><span class="status-dot"></span>SYSTEM STATUS: ACTIVE</div>
+    <h1 class="hero-title">DECADEDRIFT:<br>NAVIGATING<br><span class="highlight">MARKET</span><br>EVOLUTION</h1>
+    <p class="hero-sub">From Humans Coding Machines To Machines Thinking For Us</p>
+    <button class="hero-btn" onclick="showPage('compare')">START ANALYSIS</button>
+    <div class="hero-coords">
+      <span>COORDINATE: 00.00</span>
+      <span>STATUS: OPTIMAL</span>
+    </div>
+  </section>
+
+  <!-- TICKER TAPE -->
+  <div class="ticker-tape">
+    <div class="ticker-inner">
+      <span class="ticker-item"><span class="t">NVDA</span> $140 <span class="dn">+17%</span></span>
+      <span class="ticker-item"><span class="t">MU</span> $410 <span class="up">+343%</span></span>
+      <span class="ticker-item"><span class="t">PLTR</span> $170 <span class="up">+106%</span></span>
+      <span class="ticker-item"><span class="t">AMD</span> $220 <span class="up">+97%</span></span>
+      <span class="ticker-item"><span class="t">INTC</span> $42.5 <span class="dn">+85%</span></span>
+      <span class="ticker-item"><span class="t">AAPL</span> — <span class="up">↑</span></span>
+      <span class="ticker-item"><span class="t">MSFT</span> — <span class="up">↑</span></span>
+      <span class="ticker-item"><span class="t">GOOGL</span> — <span class="up">↑</span></span>
+      <span class="ticker-item"><span class="t">TSLA</span> — <span class="up">↑</span></span>
+      <span class="ticker-item"><span class="t">META</span> — <span class="up">↑</span></span>
+      <!-- duplicate for seamless loop -->
+      <span class="ticker-item"><span class="t">NVDA</span> $140 <span class="dn">+17%</span></span>
+      <span class="ticker-item"><span class="t">MU</span> $410 <span class="up">+343%</span></span>
+      <span class="ticker-item"><span class="t">PLTR</span> $170 <span class="up">+106%</span></span>
+      <span class="ticker-item"><span class="t">AMD</span> $220 <span class="up">+97%</span></span>
+      <span class="ticker-item"><span class="t">INTC</span> $42.5 <span class="dn">+85%</span></span>
+      <span class="ticker-item"><span class="t">AAPL</span> — <span class="up">↑</span></span>
+      <span class="ticker-item"><span class="t">MSFT</span> — <span class="up">↑</span></span>
+      <span class="ticker-item"><span class="t">GOOGL</span> — <span class="up">↑</span></span>
+      <span class="ticker-item"><span class="t">TSLA</span> — <span class="up">↑</span></span>
+      <span class="ticker-item"><span class="t">META</span> — <span class="up">↑</span></span>
+    </div>
+  </div>
+
+  <!-- STOCKS SECTION -->
+  <div class="section">
+    <div class="section-eyebrow">Market Research</div>
+    <h2 class="section-title">Top 5 Stocks In 2016 &amp; 2026</h2>
+    <hr class="divider"/>
+
+    <!-- 2016 TABLE -->
+    <div class="year-block">
+      <div class="year-label">2016</div>
+      <div class="year-meta">
+        <span>Jan 1st</span><span>|</span><span>Dec 1st</span><span>|</span><span>% Gain YTD</span>
+      </div>
+      <table class="stocks-table">
+        <thead>
+          <tr>
+            <th>Company</th><th>Jan 1st</th><th>Dec 1st</th><th>% Gain YTD</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="ticker">NVDA</span> — NVIDIA</td><td>$32</td><td>$100</td><td class="gain">+205%</td><td><span class="stock-arrow" onclick="scrollToAnalysis('NVDA','2016')">→</span></td></tr>
+          <tr><td><span class="ticker">MU</span> — Micron Technology</td><td>$14</td><td>$23</td><td class="gain">+138%</td><td><span class="stock-arrow" onclick="scrollToAnalysis('MU','2016')">→</span></td></tr>
+          <tr><td><span class="ticker">ULTA</span> — Ultra Beauty</td><td>$155</td><td>$260</td><td class="gain">+60%</td><td><span class="stock-arrow" onclick="scrollToAnalysis('ULTA','2016')">→</span></td></tr>
+          <tr><td><span class="ticker">CSX</span> — CSX Corporation</td><td>$24</td><td>$36</td><td class="gain">+56%</td><td><span class="stock-arrow" onclick="scrollToAnalysis('CSX','2016')">→</span></td></tr>
+          <tr><td><span class="ticker">AMAT</span> — Applied Materials</td><td>$18</td><td>$27</td><td class="gain">+56%</td><td><span class="stock-arrow" onclick="scrollToAnalysis('AMAT','2016')">→</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 2026 TABLE -->
+    <div class="year-block">
+      <div class="year-label" style="color:var(--blue);">2026 <span style="font-size:12px;color:var(--muted);font-family:var(--mono);"> ✦ Day Researched</span></div>
+      <div class="year-meta">
+        <span>May 28th 2025</span><span>|</span><span>May 28th 2026</span><span>|</span><span>% Gain YTD</span>
+        <span style="color:var(--orange);font-size:10px;">(1 exact year from 2025–2026 for simplification)</span>
+      </div>
+      <table class="stocks-table">
+        <thead>
+          <tr><th>Company</th><th>May 28th 2025</th><th>May 28th 2026</th><th>% Gain YTD</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="ticker">MU</span> — Micron Technology</td><td>$92.5</td><td>$410</td><td class="gain">+343%</td><td><span class="stock-arrow" onclick="scrollToAnalysis('MU','2026')">→</span></td></tr>
+          <tr><td><span class="ticker">PLTR</span> — Palantir</td><td>$82.5</td><td>$170</td><td class="gain">+106%</td><td><span class="stock-arrow" onclick="scrollToAnalysis('PLTR','2026')">→</span></td></tr>
+          <tr><td><span class="ticker">AMD</span> — AMD</td><td>$111.50</td><td>$220</td><td class="gain">+97%</td><td><span class="stock-arrow" onclick="scrollToAnalysis('AMD','2026')">→</span></td></tr>
+          <tr><td><span class="ticker">INTC</span> — Intel</td><td>$23</td><td>$42.5</td><td class="gain">+85%</td><td><span class="stock-arrow" onclick="scrollToAnalysis('INTC','2026')">→</span></td></tr>
+          <tr><td><span class="ticker">NVDA</span> — NVIDIA</td><td>$120</td><td>$140</td><td class="gain">+17%</td><td><span class="stock-arrow" onclick="scrollToAnalysis('NVDA','2026')">→</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 2016 ANALYSIS -->
+  <div class="section" id="analysis-2016">
+    <div class="section-eyebrow">Deep Dive</div>
+    <h2 class="section-title">2016 Stock Giants — Analysis</h2>
+    <p style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:32px;letter-spacing:1px;">THEMES NOTICED</p>
+    <div class="analysis-grid">
+      <div class="analysis-card" id="card-NVDA-2016">
+        <div class="card-ticker">NVDA</div>
+        <div class="card-name">NVIDIA CORPORATION — 2016</div>
+        <div class="card-gain">+205% YTD</div>
+        <div class="card-body">In 2016 Nvidia was a gaming company, specifically for GPU manufacturing. Their GeForce cards were the industry standard. Nvidia launched CUDA in 2006 — in 2016 CUDA 8 was released alongside Pascal Architecture and the Tesla P100 (3,584 CUDA cores, HBM2 memory). NYU, UOT, and the Swiss AI Lab accelerated their neural networks on Nvidia GPUs. AI research communities had been using Nvidia products for years.</div>
+        <div><span class="card-tag">GPU</span><span class="card-tag">AI HARDWARE</span><span class="card-tag">GAMING</span></div>
+      </div>
+      <div class="analysis-card" id="card-MU-2016">
+        <div class="card-ticker">MU</div>
+        <div class="card-name">MICRON TECHNOLOGY — 2016</div>
+        <div class="card-gain">+138% YTD</div>
+        <div class="card-body">Micron makes DRAM and NAND flash. In 2015–early 2016 there was a massive price crash from overbuilding. Micron almost went bankrupt but persevered. By mid-2016 supply normalized, DRAM prices stabilized, and NAND demand surged with SSD adoption. Micron pulled back from aggressive capacity expansion — a disciplined move that set up their recovery and eventual dominance.</div>
+        <div><span class="card-tag">DRAM</span><span class="card-tag">NAND</span><span class="card-tag">RECOVERY</span></div>
+      </div>
+      <div class="analysis-card" id="card-AMAT-2016">
+        <div class="card-ticker">AMAT</div>
+        <div class="card-name">APPLIED MATERIALS — 2016</div>
+        <div class="card-gain">+56% YTD</div>
+        <div class="card-body">AMAT was a standout performer unlike Micron — it didn't need recovery, it was booming all year. They make the equipment required to build chips — serving all sides of the industry. Revenue split across three segments: AGS (services), semiconductors systems, and display. Consistent earnings, genuine market share gains, and ideal positioning for the chip industry's future.</div>
+        <div><span class="card-tag">CHIP EQUIPMENT</span><span class="card-tag">B2B</span><span class="card-tag">STRUCTURAL</span></div>
+      </div>
+      <div class="analysis-card" id="card-CSX-2016">
+        <div class="card-ticker">CSX</div>
+        <div class="card-name">CSX CORPORATION — 2016</div>
+        <div class="card-gain">+56% YTD</div>
+        <div class="card-body">CSX had been suffering from low commodity pricing and coal decline. CSX hauls a huge amount of freight on US eastern railroads. November 8th, 2016 — Election Day — changed everything. Trump campaigned on reviving coal, and CSX recorded its highest single-day rise: +6% among eastern railroads. CSX's surge was almost entirely dependent on that political moment.</div>
+        <div><span class="card-tag">RAILROAD</span><span class="card-tag">COAL</span><span class="card-tag">POLITICAL CATALYST</span></div>
+      </div>
+      <div class="analysis-card" id="card-ULTA-2016">
+        <div class="card-ticker">ULTA</div>
+        <div class="card-name">ULTRA BEAUTY — 2016</div>
+        <div class="card-gain">+60% YTD</div>
+        <div class="card-body">Ultra Beauty's success came from their all-in-one-model stores — prestigious brands alongside mass-market brands with in-store salons. No one else offered this range of cosmetic products. Their Ultamate Rewards loyalty program drove constant return customers. Critically, Amazon was not yet a major threat — in 2016 consumers rarely bought cosmetics online they'd never tried before.</div>
+        <div><span class="card-tag">RETAIL</span><span class="card-tag">BEAUTY</span><span class="card-tag">LOYALTY</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2026 ANALYSIS -->
+  <div class="section" id="analysis-2026" style="border-top:1px solid var(--border);">
+    <div class="section-eyebrow">Deep Dive</div>
+    <h2 class="section-title">2026 Stock Giants — Analysis</h2>
+    <p style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:32px;letter-spacing:1px;">THEMES NOTICED</p>
+    <div class="analysis-grid">
+      <div class="analysis-card" id="card-MU-2026">
+        <div class="card-ticker">MU</div>
+        <div class="card-name">MICRON TECHNOLOGY — 2026</div>
+        <div class="card-gain">+343% YTD</div>
+        <div class="card-body">Micron became the biggest winner of the AI infrastructure wave. HBM3E (High Bandwidth Memory) became the critical bottleneck for AI accelerators — every GPU cluster needs it. Micron's capacity discipline in prior years meant they were lean and ready to scale. As hyperscalers rushed to build AI datacenters, Micron was one of the only suppliers who could deliver at volume.</div>
+        <div><span class="card-tag">HBM</span><span class="card-tag">AI INFRA</span><span class="card-tag">DATA CENTER</span></div>
+      </div>
+      <div class="analysis-card" id="card-PLTR-2026">
+        <div class="card-ticker">PLTR</div>
+        <div class="card-name">PALANTIR — 2026</div>
+        <div class="card-gain">+106% YTD</div>
+        <div class="card-body">Palantir's AIP (Artificial Intelligence Platform) became the enterprise AI deployment layer that most large organizations couldn't build themselves. Government contracts expanded globally. The commercial segment inflected — revenue growth accelerated past 40% YoY. Palantir had spent a decade being misunderstood as a defense contractor; 2025–2026 proved it was an enterprise software company at its core.</div>
+        <div><span class="card-tag">ENTERPRISE AI</span><span class="card-tag">GOVERNMENT</span><span class="card-tag">AIP</span></div>
+      </div>
+      <div class="analysis-card" id="card-AMD-2026">
+        <div class="card-ticker">AMD</div>
+        <div class="card-name">AMD — 2026</div>
+        <div class="card-gain">+97% YTD</div>
+        <div class="card-body">AMD's MI300X and MI350 accelerators took meaningful share from NVIDIA in AI training workloads — particularly at hyperscalers looking to diversify their GPU supply. ROCm software maturity improved dramatically. AMD also gained CPU share in data centers with EPYC. The dual CPU+GPU story gave AMD a rare leverage point as AI clusters required both in massive quantities.</div>
+        <div><span class="card-tag">MI300X</span><span class="card-tag">GPU</span><span class="card-tag">EPYC</span></div>
+      </div>
+      <div class="analysis-card" id="card-INTC-2026">
+        <div class="card-ticker">INTC</div>
+        <div class="card-name">INTEL — 2026</div>
+        <div class="card-gain">+85% YTD</div>
+        <div class="card-body">Intel's turnaround story became credible in 2025–2026. Intel 18A process node proved competitive with TSMC N2 in early benchmarks — a major milestone after years of manufacturing delays. The CHIPS Act funding unlocked new US fab capacity. Pat Gelsinger's foundry strategy began to attract external customers. Intel went from a market darling to near-irrelevant and back — a remarkable recovery arc.</div>
+        <div><span class="card-tag">FOUNDRY</span><span class="card-tag">18A NODE</span><span class="card-tag">CHIPS ACT</span></div>
+      </div>
+      <div class="analysis-card" id="card-NVDA-2026">
+        <div class="card-ticker">NVDA</div>
+        <div class="card-name">NVIDIA — 2026</div>
+        <div class="card-gain">+17% YTD</div>
+        <div class="card-body">NVIDIA remained dominant but faced the law of large numbers. Starting from a $3T+ market cap, even massive revenue growth produced modest percentage gains. The Blackwell architecture continued to sell out. Competition from AMD, Intel, and custom silicon (Google TPUs, Amazon Trainium) compressed NVIDIA's moat slightly. Still the undisputed leader in AI compute — but the easy money had already been made.</div>
+        <div><span class="card-tag">BLACKWELL</span><span class="card-tag">AI COMPUTE</span><span class="card-tag">MATURE GIANT</span></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /home-page -->
+
+<!-- ═══════════ COMPARE PAGE ═══════════ -->
+<div id="compare-page" class="page">
+  <div class="compare-hero">
+    <div class="section-eyebrow" style="margin-bottom:16px;">Analysis Tool</div>
+    <h1>Compare Stocks:<br>2016 vs 2026</h1>
+    <p style="margin-top:16px;">Select one or more stocks to compare their performance across the decade.</p>
+  </div>
+
+  <div class="stock-picker" id="stockPicker">
+    <button class="pick-btn" data-stock="NVDA" onclick="toggleStock(this)">NVDA — NVIDIA</button>
+    <button class="pick-btn" data-stock="MU" onclick="toggleStock(this)">MU — Micron</button>
+    <button class="pick-btn" data-stock="PLTR" onclick="toggleStock(this)">PLTR — Palantir</button>
+    <button class="pick-btn" data-stock="AMD" onclick="toggleStock(this)">AMD</button>
+    <button class="pick-btn" data-stock="INTC" onclick="toggleStock(this)">INTC — Intel</button>
+    <button class="pick-btn" data-stock="ULTA" onclick="toggleStock(this)">ULTA — Ultra Beauty</button>
+    <button class="pick-btn" data-stock="CSX" onclick="toggleStock(this)">CSX — CSX Corp</button>
+    <button class="pick-btn" data-stock="AMAT" onclick="toggleStock(this)">AMAT — Applied Materials</button>
+  </div>
+
+  <div style="text-align:center;margin-bottom:40px;">
+    <button class="compare-btn" onclick="runCompare()">RUN COMPARISON →</button>
+  </div>
+
+  <div class="compare-results" id="compareResults">
+    <div class="no-selection">Select stocks above and click RUN COMPARISON to see the analysis.</div>
+  </div>
+</div>
+
+<!-- ═══════════ BLOG PAGE ═══════════ -->
+<div id="blog-page" class="page">
+  <div class="blog-hero">
+    <div class="section-eyebrow">Research &amp; Commentary</div>
+    <h2 class="section-title">Blog</h2>
+    <hr class="divider"/>
+  </div>
+  <div class="blog-grid">
+    <div class="blog-card">
+      <div class="blog-tag">MARKET ANALYSIS</div>
+      <div class="blog-title">Why AI Infrastructure is the 2026 Version of the 2016 GPU Boom</div>
+      <div class="blog-excerpt">The parallels between NVIDIA's 2016 run and today's AI infrastructure supercycle are striking — but the scale is entirely different.</div>
+      <div class="blog-date">JUNE 2026</div>
+    </div>
+    <div class="blog-card">
+      <div class="blog-tag">DEEP DIVE</div>
+      <div class="blog-title">Micron's Decade: From Near-Bankruptcy to AI's Most Critical Supplier</div>
+      <div class="blog-excerpt">How a decade of capacity discipline and a single product — HBM3E — turned Micron into the unexpected winner of the AI era.</div>
+      <div class="blog-date">MAY 2026</div>
+    </div>
+    <div class="blog-card">
+      <div class="blog-tag">THESIS</div>
+      <div class="blog-title">Palantir Was Never a Defense Contractor</div>
+      <div class="blog-excerpt">The market mispriced Palantir for a decade because it couldn't see past the government contracts. AIP changed everything.</div>
+      <div class="blog-date">APRIL 2026</div>
+    </div>
+    <div class="blog-card">
+      <div class="blog-tag">LESSONS</div>
+      <div class="blog-title">The CSX Election Trade: A Warning About Catalyst-Driven Investing</div>
+      <div class="blog-excerpt">CSX's 2016 surge was almost entirely political. What happens when the catalyst disappears? A case study in timing vs. fundamentals.</div>
+      <div class="blog-date">MARCH 2026</div>
+    </div>
+    <div class="blog-card">
+      <div class="blog-tag">COMPARE</div>
+      <div class="blog-title">Intel's Second Act: Is the 18A Turnaround Real?</div>
+      <div class="blog-excerpt">After years of manufacturing setbacks, Intel 18A benchmarks are turning heads. We look at what the data actually says.</div>
+      <div class="blog-date">FEBRUARY 2026</div>
+    </div>
+    <div class="blog-card">
+      <div class="blog-tag">MACRO</div>
+      <div class="blog-title">The Decade Long Market Shift: From Human-Coded to Machine-Thinking</div>
+      <div class="blog-excerpt">Why have certain companies risen and why have certain companies fallen? The decade shift from 2016 to 2026 in one essay.</div>
+      <div class="blog-date">JANUARY 2026</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── PAGE NAVIGATION ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById(name + '-page').classList.add('active');
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── SCROLL TO ANALYSIS ──
+function scrollToAnalysis(ticker, year) {
+  showPage('home');
+  setTimeout(() => {
+    const el = document.getElementById('card-' + ticker + '-' + year);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.style.borderColor = 'var(--orange)';
+      el.style.boxShadow = '0 0 20px rgba(245,130,10,0.15)';
+      setTimeout(() => {
+        el.style.borderColor = '';
+        el.style.boxShadow = '';
+      }, 2500);
+    }
+  }, 100);
+}
+
+// ── COMPARE TOOL ──
+const STOCK_DATA = {
+  NVDA:  { name:'NVIDIA',           gain2016: 205, gain2026: 17,  note2016:'GPU gaming dominance + CUDA 8 / Pascal architecture launch drove AI research adoption.', note2026:'Law of large numbers at $3T+ market cap. Still dominant in Blackwell AI compute but easy gains already priced in.' },
+  MU:    { name:'Micron Technology', gain2016: 138, gain2026: 343, note2016:'Recovered from DRAM price crash. Supply discipline + SSD adoption of NAND flash drove rebound.', note2026:'HBM3E became the critical AI bottleneck. Capacity discipline in prior years meant Micron could scale fast when demand exploded.' },
+  PLTR:  { name:'Palantir',          gain2016: null, gain2026: 106, note2016:'Not yet public in 2016.', note2026:'AIP platform inflected enterprise AI adoption. Commercial revenue accelerated past 40% YoY growth.' },
+  AMD:   { name:'AMD',               gain2016: null, gain2026: 97,  note2016:'AMD was not in the 2016 top 5 — they were still recovering under Lisa Su.', note2026:'MI300X took meaningful GPU share from NVIDIA. EPYC CPUs dominated new data center deployments.' },
+  INTC:  { name:'Intel',             gain2016: null, gain2026: 85,  note2016:'Intel was dominant in 2016 but not a top performer — already losing ground on process nodes.', note2026:'18A process node proved competitive. CHIPS Act funding + foundry strategy attracted external customers.' },
+  ULTA:  { name:'Ultra Beauty',      gain2016: 60,  gain2026: null, note2016:'All-in-one stores + Ultamate Rewards loyalty + low Amazon threat created the perfect retail setup.', note2026:'Not in the 2026 top 5 — Amazon and DTC brands eroded the moat over the decade.' },
+  CSX:   { name:'CSX Corporation',   gain2016: 56,  gain2026: null, note2016:'Trump election catalyst drove +6% single-day surge. Almost entirely political, not fundamental.', note2026:'Not in the 2026 top 5 — coal long-term decline continued despite short-term political tailwinds.' },
+  AMAT:  { name:'Applied Materials', gain2016: 56,  gain2026: null, note2016:'Chip equipment supplier boomed on all sides of the industry. Consistent earnings, genuine market share.', note2026:'Not in the 2026 top 5 — still a strong compounder but did not have a breakout year.' },
+};
+
+let selectedStocks = [];
+
+function toggleStock(btn) {
+  const stock = btn.dataset.stock;
+  if (selectedStocks.includes(stock)) {
+    selectedStocks = selectedStocks.filter(s => s !== stock);
+    btn.classList.remove('selected');
+  } else {
+    selectedStocks.push(stock);
+    btn.classList.add('selected');
+  }
+}
+
+function runCompare() {
+  const el = document.getElementById('compareResults');
+  if (selectedStocks.length === 0) {
+    el.innerHTML = '<div class="no-selection">Please select at least one stock to compare.</div>';
+    return;
+  }
+  let html = '';
+  selectedStocks.forEach(ticker => {
+    const d = STOCK_DATA[ticker];
+    const g16 = d.gain2016;
+    const g26 = d.gain2026;
+    const max = Math.max(g16 || 0, g26 || 0, 1);
+    const w16 = g16 ? Math.round((g16 / max) * 100) : 0;
+    const w26 = g26 ? Math.round((g26 / max) * 100) : 0;
+
+    html += `<div class="compare-card">
+      <div class="compare-header">
+        <div>
+          <div class="col-label">TICKER</div>
+          <div class="col-value" style="color:var(--orange)">${ticker}</div>
+        </div>
+        <div>
+          <div class="col-label">2016 GAIN</div>
+          <div class="col-value ${g16 ? 'green' : ''}">${g16 ? '+' + g16 + '%' : 'N/A'}</div>
+        </div>
+        <div>
+          <div class="col-label">2026 GAIN</div>
+          <div class="col-value ${g26 ? 'green' : ''}">${g26 ? '+' + g26 + '%' : 'N/A'}</div>
+        </div>
+      </div>
+      <div class="compare-bar-wrap">
+        <div class="compare-bar-label">PERFORMANCE COMPARISON</div>
+        <div class="dual-bar">
+          <div class="bar-side">
+            <div class="year-tag">2016</div>
+            <div class="bar-track">
+              ${g16 ? `<div class="bar-fill-2016" style="width:${w16}%"><span class="bar-pct">+${g16}%</span></div>` : `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:6px 10px;">Not in top 5</div>`}
+            </div>
+          </div>
+          <div class="bar-side">
+            <div class="year-tag">2026</div>
+            <div class="bar-track">
+              ${g26 ? `<div class="bar-fill-2026" style="width:${w26}%"><span class="bar-pct">+${g26}%</span></div>` : `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:6px 10px;">Not in top 5</div>`}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="compare-insight">
+        <strong>2016:</strong> ${d.note2016}<br/><br/>
+        <strong>2026:</strong> ${d.note2026}
+      </div>
+    </div>`;
+  });
+  el.innerHTML = html;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
